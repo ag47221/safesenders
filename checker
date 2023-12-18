@@ -1,0 +1,46 @@
+$filePath = "C:\MSOCache\safesenders.txt" 
+  
+  if (Test-Path $filePath) {
+    $file = Get-Item $filePath
+    if ($file.CreationTime -ge (Get-Date).AddDays(-7)) {
+        Write-Host "compliant"
+    } else {
+        Write-Host "not-compliant"
+    }
+} else {
+    Write-Host "not-compliant"
+}
+if not, then do this:
+
+# Set the repository URL and local directory
+$repositoryUrl = "https://github.deere.com/your/repository/archive/main.zip"
+$localDirectory = "C:\Temp\GithubRepo"
+ 
+# Download the repository as a zip file
+$zipFilePath = "C:\Temp\repo.zip"
+Invoke-WebRequest -Uri $repositoryUrl -OutFile $zipFilePath
+ 
+# Create the local directory if it doesn't exist
+if (-not (Test-Path -Path $localDirectory)) {
+    New-Item -ItemType Directory -Path $localDirectory | Out-Null
+}
+ 
+# Extract the contents of the zip file to the local directory
+Expand-Archive -Path $zipFilePath -DestinationPath $localDirectory
+ 
+# Check and create the folder if it doesn't exist
+$folderPath = "C:\MSOCache"
+if (-not (Test-Path -Path $folderPath)) {
+    New-Item -ItemType Directory -Path $folderPath | Out-Null
+}
+ 
+# Check if the safesenders.txt file exists in the repository and copy it to the destination if found
+$fileToCopy = Join-Path $localDirectory "repository\path\to\safesenders.txt"
+if (Test-Path $fileToCopy) {
+    Copy-Item -Path $fileToCopy -Destination "C:\MSOCache\safesenders.txt" -Force
+} else {
+    Write-Host "safesenders.txt not found in the repository."
+}
+ 
+# Clean up - remove the zip file
+Remove-Item -Path $zipFilePath  
